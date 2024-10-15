@@ -28,7 +28,7 @@ class GameWindow < Gosu::Window
 
     @bullets.each do |bullet|
       @alien_swarm.aliens.each do |alien|
-        handle_collision(alien, bullet) if @score_manager.collision?(alien, bullet) && alien.dead?
+        handle_collision(alien, bullet) if @score_manager.collision?(alien, bullet) && !alien.dead?
       end
     end
   end
@@ -37,7 +37,7 @@ class GameWindow < Gosu::Window
     alien.hit!
     @bullets.delete(bullet)
     @score_manager.increment(10)
-    @score_manager.inmcrement(50) if alien.dead?
+    @score_manager.increment(50) if alien.dead?
   end
 
   def draw

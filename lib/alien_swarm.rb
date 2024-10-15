@@ -11,7 +11,7 @@ class AlienSwarm
     @move_interval = 30 # Frames between moves
     @drop_amount = 20
     @horizontal_step = 10
-    @steps_before_drop = 4
+    @steps_before_drop = 10
     @current_step = 0
     @speed = 2
     create_swarm
@@ -70,5 +70,9 @@ class AlienSwarm
 
   def remove_dead_aliens
     @aliens.reject!(&:dead?)
+  end
+
+  def all_destroyed?
+    @aliens.empty?
   end
 end

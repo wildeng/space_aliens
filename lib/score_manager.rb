@@ -31,9 +31,9 @@ class ScoreManager
     alien_box = alien.bounding_box
     bullet_box = bullet.bounding_box
 
-    !(bullet_box[:left] > alien_box[:left] ||
-      bullet_box[:right] < alien_box[:left] ||
-      bullet_box[:top] > alien_box[:bottom] ||
-      bullet_box[:bottom] < alien_box[:top])
+    !(alien_box[:left] > bullet_box[:left] ||
+      alien_box[:right] < bullet_box[:left] ||
+      alien_box[:top] > bullet_box[:bottom] ||
+      alien_box[:bottom] < bullet_box[:top])
   end
 end

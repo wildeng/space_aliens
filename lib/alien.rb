@@ -11,7 +11,7 @@ class Alien
     @color = get_color(color)
     @direction = :right
     @size = 5
-    @health = 3
+    @damage = 0
   end
 
   def bounding_box
@@ -24,12 +24,12 @@ class Alien
   end
 
   def hit!
-    @health -= 1
-    adjust_size
+    @damage += 1 if @damage < 2
+    # adjust_size
   end
 
   def dead?
-    @health <= 0
+    @damage >= 2
   end
 
   def move(speed)
@@ -41,12 +41,12 @@ class Alien
   end
 
   def draw
-    case @health
-    when 3
+    case @damage
+    when 0
       draw_undamaged
-    when 2
-      draw_slightly_damaged
     when 1
+      draw_slightly_damaged
+    when 2
       draw_heavily_damaged
     end
   end
