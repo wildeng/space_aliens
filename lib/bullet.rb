@@ -31,6 +31,6 @@ class Bullet
   end
 
   def off_screen?
-    (@y + @radius).negative?
+    bounding_box[:bottom].negative?
   end
 end

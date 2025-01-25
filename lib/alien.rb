@@ -2,9 +2,9 @@
 
 # Class that defines how an alien looks
 class Alien
-  attr_accessor :x, :y, :direction
+  attr_accessor :x, :y, :direction, :row, :damage
 
-  def initialize(window, horiz, vert, color)
+  def initialize(window, horiz, vert, color, row)
     @x = horiz
     @y = vert
     @window = window
@@ -12,6 +12,7 @@ class Alien
     @direction = :right
     @size = 5
     @damage = 0
+    @row = row
   end
 
   def bounding_box
@@ -25,7 +26,6 @@ class Alien
 
   def hit!
     @damage += 1 if @damage < 2
-    # adjust_size
   end
 
   def dead?
@@ -100,9 +100,5 @@ class Alien
       cyan: Gosu::Color::CYAN,
       blue: Gosu::Color::BLUE
     }[color_name] || Gosu::Color::GREEN
-  end
-
-  def adjust_size
-    @size = 5 - (3 - @health)
   end
 end

@@ -2,7 +2,7 @@
 
 # class that defines a swarn of aliens
 class AlienSwarm
-  attr_reader :aliens
+  attr_reader :aliens, :bottom
 
   def initialize(window)
     @window = window
@@ -14,6 +14,9 @@ class AlienSwarm
     @steps_before_drop = 10
     @current_step = 0
     @speed = 2
+    @direction = :right
+    @bottom = 300
+    @last_row = 5
     create_swarm
   end
 
@@ -22,7 +25,7 @@ class AlienSwarm
     5.times do |row|
       color = colors[row]
       8.times do |col|
-        @aliens << Alien.new(@window, 100 + col * 60, 50 + row * 50, color)
+        @aliens << Alien.new(@window, 100 + col * 60, 50 + row * 50, color, row)
       end
     end
   end
@@ -40,9 +43,8 @@ class AlienSwarm
   end
 
   def move_aliens
-    direction = @aliens.first.direction
     @aliens.each do |alien|
-      if direction == :right
+      if @direction == :right
         alien.x += @horizontal_step
       else
         alien.x -= @horizontal_step
@@ -60,12 +62,24 @@ class AlienSwarm
   end
 
   def change_direction_and_drop
-    new_direction = @aliens.first.direction == :right ? :left : :right
+    @direction = @direction == :right ? :left : :right
 
     @aliens.each do |alien|
-      alien.direction = new_direction
       alien.drop(@drop_amount)
     end
+    # we need this to check if the last line collides with the spaceship
+    @bottom += @drop_amount - removed_row_check_adjust
+  end
+
+  def removed_row_check_adjust
+    return 0 if @last_row.negative?
+
+    aliens_by_row = @aliens.group_by(&:row)
+    if aliens_by_row[@last_row].nil? || aliens_by_row[@last_row].empty?
+      @last_row -= 1
+      return 50
+    end
+    0
   end
 
   def remove_dead_aliens

@@ -16,8 +16,12 @@ class GameWindow < Gosu::Window
   end
 
   def update
-    @alien_swarm.update
+    return if @score_manager.game_over?
+    return if @score_manager.life_lost?
+
     @alien_swarm.remove_dead_aliens
+    @alien_swarm.update
+    @spaceship.update
     @spaceship.move_left if Gosu.button_down?(Gosu::KB_LEFT)
     @spaceship.move_right if Gosu.button_down?(Gosu::KB_RIGHT)
 
@@ -31,6 +35,15 @@ class GameWindow < Gosu::Window
         handle_collision(alien, bullet) if @score_manager.collision?(alien, bullet) && !alien.dead?
       end
     end
+
+    return unless @spaceship.alive
+
+    @alien_swarm.aliens.each do |alien|
+      if !alien.dead? && @score_manager.collision?(alien, @spaceship)
+        handle_spaceship_collision(alien)
+        break
+      end
+    end
   end
 
   def handle_collision(alien, bullet)
@@ -38,6 +51,28 @@ class GameWindow < Gosu::Window
     @bullets.delete(bullet)
     @score_manager.increment(10)
     @score_manager.increment(50) if alien.dead?
+  end
+
+  def handle_spaceship_collision(alien)
+    alien.damage = 2
+    @score_manager.decrement_lives
+    @spaceship.explode
+  end
+
+  def button_down(id)
+    if @score_manager.life_lost? && !@score_manager.game_over?
+      @score_manager.life_lost_reset
+      @alien_swarm = AlienSwarm.new(self)
+      @spaceship = Spaceship.new(self)
+      @bullets.clear
+      return
+    end
+    return unless id == Gosu::KB_R && @score_manager.game_over?
+
+    @score_manager.reset
+    @alien_swarm = AlienSwarm.new(self)
+    @spaceship = Spaceship.new(self)
+    @bullets.clear
   end
 
   def draw
