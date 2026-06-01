@@ -8,6 +8,9 @@ class ScoreManager
     @lives = 3
     @life_lost = false
     @game_over = false
+    @won = false
+    @font_small = nil
+    @font_large = nil
   end
 
   def increment(points = 1)
@@ -24,14 +27,20 @@ class ScoreManager
     draw_score(window)
     draw_lives(window)
     draw_game_over(window) if @game_over
+    draw_win(window) if @won
+    draw_life_lost_prompt(window) if @life_lost
+  end
+
+  def font_small(window)
+    @font_small ||= Gosu::Font.new(window, Gosu.default_font_name, 20)
+  end
+
+  def font_large(window)
+    @font_large ||= Gosu::Font.new(window, Gosu.default_font_name, 50)
   end
 
   def draw_score(window)
-    Gosu::Font.new(
-      window,
-      Gosu.default_font_name,
-      20
-    ).draw_text(
+    font_small(window).draw_text(
       "Score: #{@score}",
       10,
       10,
@@ -43,11 +52,7 @@ class ScoreManager
   end
 
   def draw_lives(window)
-    Gosu::Font.new(
-      window,
-      Gosu.default_font_name,
-      20
-    ).draw_text(
+    font_small(window).draw_text(
       "Lives: #{@lives}",
       10,
       40,
@@ -59,11 +64,32 @@ class ScoreManager
   end
 
   def draw_game_over(window)
-    font = Gosu::Font.new(window, Gosu.default_font_name, 50)
     text = 'GAME OVER'
-    x = (window.width - font.text_width(text)) / 2
+    x = (window.width - font_large(window).text_width(text)) / 2
     y = window.height / 2
-    font.draw_text(text, x, y, 1, 1.0, 1.0, Gosu::Color::RED)
+    font_large(window).draw_text(text, x, y, 1, 1.0, 1.0, Gosu::Color::RED)
+    draw_restart_prompt(window, y + 60)
+  end
+
+  def draw_win(window)
+    text = 'YOU WIN!'
+    x = (window.width - font_large(window).text_width(text)) / 2
+    y = window.height / 2
+    font_large(window).draw_text(text, x, y, 1, 1.0, 1.0, Gosu::Color::GREEN)
+    draw_restart_prompt(window, y + 60)
+  end
+
+  def draw_restart_prompt(window, y)
+    text = 'Press R to restart'
+    x = (window.width - font_small(window).text_width(text)) / 2
+    font_small(window).draw_text(text, x, y, 1, 1.0, 1.0, Gosu::Color::WHITE)
+  end
+
+  def draw_life_lost_prompt(window)
+    text = 'Press any key to continue'
+    x = (window.width - font_small(window).text_width(text)) / 2
+    y = window.height / 2
+    font_small(window).draw_text(text, x, y, 1, 1.0, 1.0, Gosu::Color::WHITE)
   end
 
   def collision?(object_one, object_two)
@@ -82,6 +108,14 @@ class ScoreManager
     @game_over
   end
 
+  def won?
+    @won
+  end
+
+  def win
+    @won = true
+  end
+
   def life_lost?
     @life_lost
   end
@@ -94,5 +128,7 @@ class ScoreManager
     @score = 0
     @lives = 3
     @game_over = false
+    @life_lost = false
+    @won = false
   end
 end

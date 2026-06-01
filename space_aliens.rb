@@ -8,7 +8,7 @@ require_relative 'lib/score_manager'
 class GameWindow < Gosu::Window
   def initialize
     super 800, 600
-    self.caption = '80s style game create in collaboration with Claude Ai'
+    self.caption = '80s style game created with Gosu'
     @alien_swarm = AlienSwarm.new(self)
     @spaceship = Spaceship.new(self)
     @score_manager = ScoreManager.new
@@ -18,6 +18,7 @@ class GameWindow < Gosu::Window
   def update
     return if @score_manager.game_over?
     return if @score_manager.life_lost?
+    return if @score_manager.won?
 
     @alien_swarm.remove_dead_aliens
     @alien_swarm.update
@@ -30,10 +31,15 @@ class GameWindow < Gosu::Window
     @bullets.each(&:update)
     @bullets.reject!(&:off_screen?)
 
-    @bullets.each do |bullet|
+    @bullets.dup.each do |bullet|
       @alien_swarm.aliens.each do |alien|
         handle_collision(alien, bullet) if @score_manager.collision?(alien, bullet) && !alien.dead?
       end
+    end
+
+    if @alien_swarm.all_destroyed?
+      @score_manager.win
+      return
     end
 
     return unless @spaceship.alive
@@ -67,7 +73,7 @@ class GameWindow < Gosu::Window
       @bullets.clear
       return
     end
-    return unless id == Gosu::KB_R && @score_manager.game_over?
+    return unless (id == Gosu::KB_R && @score_manager.game_over?) || (id == Gosu::KB_R && @score_manager.won?)
 
     @score_manager.reset
     @alien_swarm = AlienSwarm.new(self)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# class that defines a swarn of aliens
+# class that defines a swarm of aliens
 class AlienSwarm
   attr_reader :aliens, :bottom
 
@@ -58,7 +58,7 @@ class AlienSwarm
       @current_step = 0
     end
     # Increase speed as aliens are destroyed
-    @move_interval = [5, 30 - (@aliens.size / 5)].max
+    @move_interval = [12, 30 - ((40 - @aliens.size) * 3 / 4)].max
   end
 
   def change_direction_and_drop

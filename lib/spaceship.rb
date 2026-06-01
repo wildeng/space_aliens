@@ -114,10 +114,10 @@ class Spaceship
 
   def bounding_box
     {
-      left: 0,
-      right: @window.width,
-      top: @initial_y - 5,
-      bottom: @window.height
+      left: @x,
+      right: @x + @width,
+      top: @y,
+      bottom: @y + @height
     }
   end
 end
