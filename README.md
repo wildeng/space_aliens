@@ -6,20 +6,35 @@ All graphics are procedurally drawn with Gosu primitives — no external assets 
 
 ## Prerequisites
 
-- **Ruby 3.3.0**
+- **Ruby 3.3.0** (or 3.2.x on Ubuntu — see below)
 - **Bundler** (`gem install bundler`)
-- **SDL2** (Gosu dependency): `brew install sdl2`
 
 ## Setup
 
+### macOS
+
 ```bash
+bundle install
+```
+
+### Ubuntu 24.04
+
+```bash
+sudo apt update
+sudo apt install -y ruby-bundler build-essential libsdl2-dev libgl1-mesa-dev libfontconfig1-dev libgmp-dev
+
+# If you have Ruby 3.2.x instead of 3.3.0, adjust the version constraint:
+sed -i "s/ruby '3.3.0'/ruby '3.2.3'/" Gemfile
+sed -i '/RUBY VERSION/,+1d' Gemfile.lock
+
+bundle config set --local path 'vendor/bundle'
 bundle install
 ```
 
 ## How to Play
 
 ```bash
-ruby space_aliens.rb
+bundle exec ruby space_aliens.rb
 ```
 
 | Key            | Action         |
