@@ -1,5 +1,6 @@
 require 'minitest/autorun'
 require 'gosu'
+require_relative '../space_aliens'
 require_relative '../lib/alien'
 require_relative '../lib/alien_swarm'
 require_relative '../lib/spaceship'

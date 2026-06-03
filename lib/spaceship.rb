@@ -77,17 +77,19 @@ class Spaceship
       respawn if @respan_timer <= 0
     end
 
-    return unless @flash_timer.positive?
-
-    @flash_timer -= 1
-    @flashing = false if @flash_timer <= 0
+    if @flash_timer.positive?
+      @flash_timer -= 1
+      @flashing = false if @flash_timer <= 0
+    end
   end
 
   def update_explosion_particles
-    @explosion_particles.each do |particle|
+    @explosion_particles.reject! do |particle|
       particle[:x] += particle[:dx]
       particle[:y] += particle[:dy]
       particle[:dy] += 1 # gravity effect
+      # Remove particles that are off-screen or too small
+      particle[:x] < 0 || particle[:x] > @window.width || particle[:y] > @window.height || particle[:size] <= 0
     end
   end
 

@@ -26,14 +26,32 @@ class GameWindow < Gosu::Window
     @spaceship.move_left if Gosu.button_down?(Gosu::KB_LEFT)
     @spaceship.move_right if Gosu.button_down?(Gosu::KB_RIGHT)
 
-    @bullets << @spaceship.fire if Gosu.button_down?(Gosu::KB_SPACE) && @bullets.empty?
+    # Debounced bullet firing
+    if Gosu.button_down?(Gosu::KB_SPACE)
+      @fire_cooldown ||= 0
+      if @bullets.empty? && @fire_cooldown.zero?
+        bullet = @spaceship.fire
+        @bullets << bullet if bullet
+        @fire_cooldown = 15 # frames (approx 0.25 sec at 60 FPS)
+      elsif @fire_cooldown.positive?
+        @fire_cooldown -= 1
+      end
+    end
 
+    # Update bullets and remove off-screen ones
     @bullets.each(&:update)
     @bullets.reject!(&:off_screen?)
 
-    @bullets.dup.each do |bullet|
-      @alien_swarm.aliens.each do |alien|
-        handle_collision(alien, bullet) if @score_manager.collision?(alien, bullet) && !alien.dead?
+    # Thread-safe collision detection
+    bullets_dup = @bullets.dup
+    aliens_dup = @alien_swarm.aliens.dup
+    
+    bullets_dup.each do |bullet|
+      aliens_dup.each do |alien|
+        if @score_manager.collision?(alien, bullet) && !alien.dead?
+          handle_collision(alien, bullet)
+          break if bullet.off_screen? # Exit early if bullet is destroyed
+        end
       end
     end
 
@@ -44,7 +62,8 @@ class GameWindow < Gosu::Window
 
     return unless @spaceship.alive
 
-    @alien_swarm.aliens.each do |alien|
+    # Thread-safe spaceship collision detection
+    @alien_swarm.aliens.dup.each do |alien|
       if !alien.dead? && @score_manager.collision?(alien, @spaceship)
         handle_spaceship_collision(alien)
         break
